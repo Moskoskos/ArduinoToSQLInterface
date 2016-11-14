@@ -22,6 +22,7 @@ namespace ArduinoSQLInterface
         private bool listeningActive = false;
         Thread thdUDPServer;
         byte[] receiveBytes;
+        char[] weightValues = new char[5];
         UdpClient udpClient;
         IPEndPoint RemoteIpEndPoint;
 
@@ -96,8 +97,10 @@ namespace ArduinoSQLInterface
 
             while (listeningActive == true)
             {
+
                 receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
-                db.ArduinoDataToDb(receiveBytes);                                    //Passing data from arduino to DB
+                Array.Copy(receiveBytes, 3, weightValues, 0, 5);                                   //copy weight from receiveBytes array into a new array
+                db.ArduinoDataToDb(receiveBytes, weightValues);                                    //Passing data from arduino to DB
                 foreach (byte val in receiveBytes)
                 {
                     AppendTextBox(RemoteIpEndPoint.Address.ToString() + val.ToString());
@@ -136,6 +139,12 @@ namespace ArduinoSQLInterface
         {
             Application.Exit();
         }
+
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
     }
 }
+
 
