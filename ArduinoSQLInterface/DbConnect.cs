@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -83,9 +83,16 @@ namespace ERP
 
 
         
-        public void ArduinoDataToDb(byte[] data)
+        public void ArduinoDataToDb(byte[] data, char[] weight)
         {
-            
+            string w1 = weight[0].ToString();
+            string w2 = weight[1].ToString();
+            string w3 = weight[2].ToString();
+            string w4 = weight[3].ToString();
+            string w5 = weight[4].ToString();
+
+            string weightValue = Convert.ToString(string.Format("{0}{1}{2}{3}{4}", w1, w2, w3, w4, w5));    //concatenate strings
+
             try
             {
                 string query = "UPDATE CupOrdre SET ActualWeight = @ActualWeight, CompletedApproved = @CompletedApproved, CompletedDiscard = @CompletedDiscard WHERE CupID = @CupID";
@@ -94,9 +101,9 @@ namespace ERP
                     {
                         OpenConnection();
                         cmd.Parameters.AddWithValue("@CupID", Convert.ToInt32(data[0]));
-                        cmd.Parameters.AddWithValue("@ActualWeight",  Convert.ToDouble(data[1]));
-                        cmd.Parameters.AddWithValue("@CompletedApproved", data[2]);
-                        cmd.Parameters.AddWithValue("@CompletedDiscard", data[3]);
+                        cmd.Parameters.AddWithValue("@ActualWeight",  weightValue);
+                        cmd.Parameters.AddWithValue("@CompletedApproved", data[1]);
+                        cmd.Parameters.AddWithValue("@CompletedDiscard", data[2]);
                         cmd.ExecuteNonQuery();
                         CloseConnection();
                     }
