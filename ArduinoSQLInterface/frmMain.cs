@@ -48,31 +48,38 @@ namespace ArduinoSQLInterface
             if (string.Equals((sender as Button).Name, @"CloseButton"))
             {
                 udpClient.Close();
+                Application.Exit();
             }
         }
 
-
+        private void ActivateListening()
+        {
+            listeningActive = true;
+            thdUDPServer = new Thread(() => ListenToPort(port));
+            thdUDPServer.Start();                                                //Start configuration of port-listening
+            DeactivateButtons();
+            rtxtMessages.AppendText("Listening commenced...\r\n");
+        }
         //s
         private void btnActivate_Click(object sender, EventArgs e)
         {
-            rtxtMessages.AppendText("Initializing port listening...\r\n");       //Dunno how long this will take, so message the user that work is in progress first.
-            listeningActive = true;
-            thdUDPServer = new Thread(() => ListenToPort(port));
-            thdUDPServer.Start();                                             //Start configuration of port-listening
+            ActivateListening();
             DeactivateButtons();
-            rtxtMessages.AppendText("Listening commenced...\r\n");
+        }
 
-            
+
+        private void DeactivateListening()
+        {
+            listeningActive = false;
+            thdUDPServer.Abort();
+            rtxtMessages.AppendText("Port listening aborted...\r\n");
+            udpClient.Close();
         }
 
         private void btnDeactivate_Click(object sender, EventArgs e)
         {
-            listeningActive = false;
-            rtxtMessages.AppendText("Aborting port listening...\r\n");      //Dunno how long this will take, so message the user that work is in progress first.
+            DeactivateListening();
             ActivateButtons();
-            thdUDPServer.Abort();
-            rtxtMessages.AppendText("Port listening aborted...\r\n");
-            udpClient.Close();
 
         }
 
