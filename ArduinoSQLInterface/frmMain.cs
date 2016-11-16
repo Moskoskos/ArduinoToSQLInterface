@@ -22,6 +22,7 @@ namespace ArduinoSQLInterface
         private bool listeningActive = false;
         Thread thdUDPServer;
         byte[] receiveBytes;
+        char[] weightValues = new char[5];
         UdpClient udpClient;
         IPEndPoint RemoteIpEndPoint;
 
@@ -46,8 +47,7 @@ namespace ArduinoSQLInterface
         {
             if (string.Equals((sender as Button).Name, @"CloseButton"))
             {
-                DeactivateListening();
-                Application.Exit();
+                udpClient.Close();
             }
         }
 
@@ -55,32 +55,25 @@ namespace ArduinoSQLInterface
         //s
         private void btnActivate_Click(object sender, EventArgs e)
         {
-            ActivateListening();
-            DeactivateButtons();
-        }
-
-        private void ActivateListening()
-        {
+            rtxtMessages.AppendText("Initializing port listening...\r\n");       //Dunno how long this will take, so message the user that work is in progress first.
             listeningActive = true;
             thdUDPServer = new Thread(() => ListenToPort(port));
-            thdUDPServer.Start();                                                //Start configuration of port-listening
+            thdUDPServer.Start();                                             //Start configuration of port-listening
             DeactivateButtons();
             rtxtMessages.AppendText("Listening commenced...\r\n");
+
+            
         }
 
         private void btnDeactivate_Click(object sender, EventArgs e)
         {
-
-            DeactivateListening();
-            ActivateButtons();
-        }
-
-        private void DeactivateListening()
-        {
             listeningActive = false;
+            rtxtMessages.AppendText("Aborting port listening...\r\n");      //Dunno how long this will take, so message the user that work is in progress first.
+            ActivateButtons();
             thdUDPServer.Abort();
             rtxtMessages.AppendText("Port listening aborted...\r\n");
             udpClient.Close();
+
         }
 
         private void rtxtMessages_TextChanged(object sender, EventArgs e)
@@ -89,9 +82,14 @@ namespace ArduinoSQLInterface
             rtxtMessages.ScrollToCaret();                                       //Makes sure that the box continues to scroll downward as text is displayed
         }
 
+        private void UDPClient()
+        {
+            //UdpClient udpc = new UdpClient();
+        }
+
 
         //http://stackoverflow.com/questions/19786668/c-sharp-udp-socket-client-and-server
-        private void ListenToPort(int portNumber)                               //Listen to port, any IP.
+        private void ListenToPort(int portNumber)                                             //Listen to port, any IP.
         {
             RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             udpClient = new UdpClient(port);
@@ -99,17 +97,20 @@ namespace ArduinoSQLInterface
 
             while (listeningActive == true)
             {
+
                 receiveBytes = udpClient.Receive(ref RemoteIpEndPoint);
-                db.ArduinoDataToDb(receiveBytes);                               //Passing data from arduino to DB
+                Array.Copy(receiveBytes, 3, weightValues, 0, 5);                                   //copy weight from receiveBytes array into a new array
+                db.ArduinoDataToDb(receiveBytes, weightValues);                                    //Passing data from arduino to DB
                 foreach (byte val in receiveBytes)
                 {
-                    AppendTextBox(RemoteIpEndPoint.Address.ToString() + ":  " + val.ToString());
+                    AppendTextBox(RemoteIpEndPoint.Address.ToString() + val.ToString());
                 }
                 if (listeningActive == false)
                 {
                     udpClient.Close();
                 }
-             
+                //Does this one actually stop when thdUDP.Abort() is called
+                //No. need to declare the instance as a global instance to be able to call it. that or a metho
             }
 
         }
@@ -131,23 +132,19 @@ namespace ArduinoSQLInterface
                 Invoke(new Action<string>(AppendTextBox), new object[] { value });
                 return;
             }
-            rtxtMessages.Text +=  value + "\r\n";
+            rtxtMessages.Text += ":  " + value + "\r\n";
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DeactivateListening();
             Application.Exit();
         }
 
-        private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (string.Equals((sender as Button).Name, @"CloseButton"))
-            {
-                DeactivateListening();
-                Application.Exit();
-            }
+
         }
     }
 }
+
 
