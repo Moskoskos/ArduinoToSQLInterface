@@ -18,13 +18,19 @@ namespace ERP
         public string conString = "";
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         public DbConnect()
         {
             //Initialze connection with connectionString
             conString = "Data Source = 192.168.2.15\\SQLEXPRESS; Initial Catalog = IA5-5-16; User ID = sa; Password = " + "netlab_1";
             connection = new SqlConnection(conString);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public bool PingHost()
         {
             string nameOrAddress = "192.168.2.15";
@@ -42,6 +48,10 @@ namespace ERP
             return pingable;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public bool OpenConnection()
         {
             try
@@ -65,10 +75,13 @@ namespace ERP
                 return false;
             }
         }
-
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public bool CloseConnection()
         {
-
             try
             {
                 connection.Close();
@@ -81,8 +94,12 @@ namespace ERP
             return true;
         }
 
-
-        
+          /// <summary>
+          /// 
+          /// </summary>
+          /// <param name="data"></param>
+          /// <param name="weight"></param>
+                          
         public void ArduinoDataToDb(byte[] data, char[] weight)
         {
             string w1 = weight[0].ToString();

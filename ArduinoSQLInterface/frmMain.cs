@@ -48,7 +48,7 @@ namespace ArduinoSQLInterface
             if (string.Equals((sender as Button).Name, @"CloseButton"))
             {
                 udpClient.Close();
-                Application.Exit();
+                System.Windows.Forms.Application.Exit();
             }
         }
 
@@ -88,12 +88,6 @@ namespace ArduinoSQLInterface
             rtxtMessages.SelectionStart = rtxtMessages.Text.Length;
             rtxtMessages.ScrollToCaret();                                       //Makes sure that the box continues to scroll downward as text is displayed
         }
-
-        private void UDPClient()
-        {
-            //UdpClient udpc = new UdpClient();
-        }
-
 
         //http://stackoverflow.com/questions/19786668/c-sharp-udp-socket-client-and-server
         private void ListenToPort(int portNumber)                                             //Listen to port, any IP.
@@ -144,7 +138,7 @@ namespace ArduinoSQLInterface
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            System.Windows.Forms.Application.Exit();
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
