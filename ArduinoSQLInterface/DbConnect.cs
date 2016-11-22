@@ -114,16 +114,19 @@ namespace ERP
             {
                 string query = "UPDATE CupOrdre SET ActualWeight = @ActualWeight, CompletedApproved = @CompletedApproved, CompletedDiscard = @CompletedDiscard WHERE CupID = @CupID";
                 {
-                    using (SqlCommand cmd = new SqlCommand(query, connection))
+                    if (OpenConnection())
                     {
-                        OpenConnection();
-                        cmd.Parameters.AddWithValue("@CupID", Convert.ToInt32(data[0]));
-                        cmd.Parameters.AddWithValue("@ActualWeight",  weightValue);
-                        cmd.Parameters.AddWithValue("@CompletedApproved", data[1]);
-                        cmd.Parameters.AddWithValue("@CompletedDiscard", data[2]);
-                        cmd.ExecuteNonQuery();
-                        CloseConnection();
+                        using (SqlCommand cmd = new SqlCommand(query, connection))
+                        {
+                            cmd.Parameters.AddWithValue("@CupID", Convert.ToInt32(data[0]));
+                            cmd.Parameters.AddWithValue("@ActualWeight", weightValue);
+                            cmd.Parameters.AddWithValue("@CompletedApproved", data[1]);
+                            cmd.Parameters.AddWithValue("@CompletedDiscard", data[2]);
+                            cmd.ExecuteNonQuery();
+                            CloseConnection();
+                        }
                     }
+
                 }
             }
             catch (Exception e)
